@@ -48,6 +48,17 @@ router.get('/getpics',async (req,res)=>{
     
 });
 
+router.post('/get/one',async (req,res)=>{
+    const id=req.body.id;
+    try{
+        const posts = await Upload.findOne({_id:id});
+        res.json(posts);
+    }catch(err){
+        res.json({message:err});
+    }
+    
+});
+
 router.post('/profilepic',profileUpload,async (req,res)=>{
     const post={
         profile:req.file.filename,
