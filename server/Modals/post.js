@@ -17,8 +17,8 @@ const PostSchema = mongoose.Schema({
         type: Array,
     },
     date: {
-        type: Date,
-        default: Date.now()
+        type: Number,
+        default: new Date().getTime()
     }
 });
 
