@@ -24,6 +24,9 @@ const uploadSchema = mongoose.Schema({
     others:{
         type: String,
     },
+    location:{
+        type: String,
+    },
     date:{
         type: Number,
         default: new Date().getTime()

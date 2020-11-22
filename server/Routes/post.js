@@ -4,7 +4,7 @@ const Upload = require('../Modals/upload');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
-const { response } = require('express');
+
 
 const Storage = multer.diskStorage({
     destination:"./public/uploads",
@@ -74,6 +74,7 @@ router.post('/postdata',async (req,res)=>{
         lenses: req.body.lenses,
         editing: req.body.editing,
         others: req.body.others,
+        location: req.body.location,
     };
     Post.findByIdAndUpdate({"_id":"5f4b2d6d66faff47dce1cdf9"},{$set:post})
 .then((response)=>{
@@ -91,6 +92,7 @@ router.post('/upload',upload, async (req,res) =>{
         lenses: info.lenses,
         editing: info.editing,
         others: info.others,
+        location: info.location,
     });
     upload.save().then(response=>{
         res.json(response);
@@ -105,7 +107,8 @@ router.post('/upload/edit', async (req,res) =>{
         camera: req.body.camera,
         lenses: req.body.lenses,
         editing: req.body.editing,
-        others: req.body.others
+        others: req.body.others,
+        location: req.body.location,
     };
     Upload.findByIdAndUpdate({"_id":req.body.id},{$set:edit}).then(response=>{
         res.json(response);
