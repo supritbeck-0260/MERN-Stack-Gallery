@@ -38,9 +38,10 @@ router.get('/get',async (req,res)=>{
     
 });
 
-router.get('/getpics',async (req,res)=>{
+router.post('/getpics',async (req,res)=>{
+    const offset = req.body.offset;
     try{
-        const posts = await Upload.find().sort({'date':-1});
+        const posts = await Upload.find().skip(offset).limit(9).sort({'date':-1});
         res.json(posts);
     }catch(err){
         res.json({message:err});
