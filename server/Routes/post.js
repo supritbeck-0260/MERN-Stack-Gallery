@@ -4,12 +4,15 @@ const Upload = require('../Modals/upload');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
+const webp=require('webp-converter');
 
-
+const compression = (type,name) =>{
+    return webp.cwebp(`./public/${type}Org/${name}`,`./public/${type+(type=='upload'?'s':'')}/${name}`,"-q 80");
+}
 const Storage = multer.diskStorage({
-    destination:"./public/uploads",
+    destination:"./public/uploadOrg",
     filename:(req,file,cb)=>{
-        cb(null,file.fieldname+"_"+Date.now()+path.extname(file.originalname))
+        cb(null,file.fieldname+"_"+Date.now()+'.webp')
     }
 });
 
@@ -18,15 +21,16 @@ const upload = multer({
 }).single('file');
 
 const StorageProfile = multer.diskStorage({
-    destination:"./public/profile",
+    destination:"./public/profileOrg",
     filename:(req,file,cb)=>{
-        cb(null,file.fieldname+"_"+Date.now()+path.extname(file.originalname))
+        cb(null,file.fieldname+"_"+Date.now()+'.webp')
     }
 });
 
 const profileUpload = multer({
     storage:StorageProfile
 }).single('profile');
+
 router.get('/get',async (req,res)=>{
     console.log('Get Request..');
     try{
@@ -64,9 +68,11 @@ router.post('/profilepic',profileUpload,async (req,res)=>{
     const post={
         profile:req.file.filename,
     }
+    compression('profile',req.file.filename).then(resp=>{
     Post.findByIdAndUpdate({"_id":"5f4b2d6d66faff47dce1cdf9"},{$set:post})
     .then((response)=>{
         res.json(response);
+    });
     });
 });
 router.post('/postdata',async (req,res)=>{
@@ -94,11 +100,14 @@ router.post('/upload',upload, async (req,res) =>{
         editing: info.editing,
         others: info.others,
         location: info.location,
+        date: Date.now()
     });
-    upload.save().then(response=>{
-        res.json(response);
-    }).catch(err=>{
-        res.json({message:err});
+    compression('upload',req.file.filename).then(resp=>{
+        upload.save().then(response=>{
+            res.json(response);
+        }).catch(err=>{
+            res.json({message:err});
+        });
     });
 });
 

@@ -29,8 +29,7 @@ const uploadSchema = mongoose.Schema({
     },
     date:{
         type: Number,
-        default: new Date().getTime()
     }
 });
 
-module.exports = mongoose.model('uploads',uploadSchema);
+module.exports = mongoose.model('newuploads',uploadSchema);
