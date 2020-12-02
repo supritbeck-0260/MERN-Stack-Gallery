@@ -7,7 +7,7 @@ const multer = require('multer');
 const path = require('path');
 const webp=require('webp-converter');
 const bcrypt = require('bcryptjs');
-
+const jwt = require('jsonwebtoken');
 const compression = (type,name) =>{
     return webp.cwebp(`./public/${type}Org/${name}`,`./public/${type+(type=='upload'?'s':'')}/${name}`,"-q 80");
 }
@@ -158,7 +158,9 @@ router.post('/signup', async (req,res)=>{
                 date:Date.now()
             });
             user.save().then(response=>{
-                res.send({message:'New user Created.'});
+                // let token;
+                // jwt.sign({});
+                res.send({message:'New user Created.',userID:user.id});
             }).catch(err=>{
                 res.status(500).json({message:'Something went wrong.! try again.'});
             }); 
@@ -182,7 +184,7 @@ router.post('/login', async (req,res)=>{
                 if(isValidPassword){
                     res.json({message:'Welcome.'});
                 }else{
-                    res.status(201).json({message:'User ID and Password does not match.'});
+                    res.status(201).json({message:'Email ID and Password does not match.'});
                 }
             } catch (error) {
                 res.status(500).json({message:'Could not login. Try again.'});
