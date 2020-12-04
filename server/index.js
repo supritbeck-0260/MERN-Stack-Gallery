@@ -6,7 +6,7 @@ const cors = require('cors');
 require('dotenv/config');
 app.use(cors());
 const postsRoute = require('./Routes/post');
-
+const AuthRoutes =  require('./Routes/Authentication');
 app.use('/', express.static(__dirname + '/public'));
 app.use(bodyParser.json());
 mongoose.connect(process.env.DB_CONNECTION,
@@ -18,5 +18,6 @@ mongoose.connect(process.env.DB_CONNECTION,
 mongoose.set('useFindAndModify', false);
 
 app.use('/',postsRoute);
+app.use('/auth',AuthRoutes);
 
 app.listen(5000,()=>{console.log("server started at 5000");});

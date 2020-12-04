@@ -3,7 +3,7 @@ const mailer = require('../mail/mailer');
 require('dotenv/config');
 const sender = async (user) =>{
     let token;
-    token = jwt.sign({userID:user.id},'The_Key_You_Cant_Guess',{expiresIn:'1h'});
+    token = jwt.sign({userID:user.id},process.env.SECRET_KEY,{expiresIn:'1h'});
     const mailOptions = {
         from: process.env.EMAIL_ID,
         to: user.email,

@@ -1,14 +1,9 @@
 const express = require('express');
 const Profile = require('../Modals/profileInfo');
 const Upload = require('../Modals/upload');
-const User = require('../Modals/user');
 const router = express.Router();
 const multer = require('multer');
-const path = require('path');
 const webp=require('webp-converter');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const sender = require('../mail/send');
 require('dotenv/config');
 
 const compression = (type,name) =>{
@@ -36,10 +31,10 @@ const profileUpload = multer({
     storage:StorageProfile
 }).single('profile');
 
-router.get('/get',async (req,res)=>{
+router.get('/profile/info/fetch',async (req,res)=>{
     console.log('Get Request..');
     try{
-        const posts = await Post.findById({"_id":"5f4b2d6d66faff47dce1cdf9"});
+        const posts = await Profile.findById({"_id":"5f4b2d6d66faff47dce1cdf9"});
         res.json(posts);
     }catch(err){
         res.json({message:err});
@@ -80,7 +75,7 @@ router.post('/profilepic',profileUpload,async (req,res)=>{
     });
     });
 });
-router.post('/postdata',async (req,res)=>{
+router.post('/profile/info/update',async (req,res)=>{
     const post = {
         camera: req.body.camera,
         lenses: req.body.lenses,
@@ -98,7 +93,7 @@ router.post('/postdata',async (req,res)=>{
 router.post('/upload',upload, async (req,res) =>{
     const info = JSON.parse(req.body.info);
     const upload = new Upload({
-        filename:req.file.filename,
+        path:process.env.UPLOAD_PATH+req.file.filename,
         about: info.about,
         camera: info.camera,
         lenses: info.lenses,
@@ -140,89 +135,6 @@ router.post('/upload/delete', async (req,res)=>{
     });
 });
 
-router.post('/signup', async (req,res)=>{
-    let hashedPassword;
-    let existingUser;
-    try{
-        hashedPassword = await bcrypt.hash(req.body.password,12);
-   }catch(err){
-       res.status(500).json({message:'Could not create user. Try again.'});
-   }
-    const {name,email,gender} = {...req.body};
-    try{
-       existingUser = await User.findOne({email:email});
-       if(existingUser && existingUser.status == 'Active'){
-        res.status(201).json({message:'This Email ID has already been registered.!'});
-       }else if(existingUser && existingUser.status == 'Inactive'){
-           try {
-            const updatedUser = await User.findByIdAndUpdate({'_id':existingUser.id},{$set:{name:name,email:email,gender:gender,password:hashedPassword}});
-              sender({id:updatedUser.id,name:name,email:email}).then(response=>{
-                  res.status(200).json({message:'Email sent to '+response.accepted[0]+ '. Please verify your Email ID.'});
-              }).catch (error=>{
-                    res.status(201).json({message:'Falied to Sign up. Please try again.'}); 
-              }); 
-           } catch (error) {
-            res.status(201).json({message:'Falied to Sign up. Please try again.'}); 
-           }
-       }else if(existingUser == null){
-            const user = new User({
-                name:name,
-                email:email,
-                gender:gender,
-                password:hashedPassword,
-                date:Date.now()
-            });
-            user.save().then(async (response)=>{
-                sender(user).then(response=>{
-                    res.status(200).json({message:'Email sent to '+response.accepted[0]+ '. Please verify your Email ID.'});
-                }).catch (error=>{
-                      res.status(201).json({message:'Falied to Sign up. Please try again.'}); 
-                }); 
-            }).catch(err=>{
-                res.status(500).json({message:'Something went wrong.! try again.'});
-            }); 
-       }else{
-        res.status(201).json({message:'Something went wrong.! try again.'});
-       }
-   }catch(err){
-       res.status(500).json({message:'Could not sign up. Try again.'});
-   }
-    
-});
 
-router.post('/login', async (req,res)=>{
-    let findUser;
-    let isValidPassword = false;
-    try{
-        findUser = await User.findOne({email:req.body.email});
-        if(!findUser){
-            res.status(201).json({message:'User ID and Password does not match.'});
-        }else{
-            try {
-                isValidPassword = await bcrypt.compare(req.body.password,findUser.password);
-                if(findUser.status=='Inactive'){
-                    res.status(201).json({message:'Please activate your email.'}); 
-                }else if(!isValidPassword){
-                    res.status(201).json({message:'Email ID and Password does not match.'});   
-                }
-                else if(isValidPassword && findUser.status=='Active'){
-                    res.json({message:'Welcome to Proclick.'});                    
-                }
-            } catch (error) {
-                res.status(500).json({message:'Could not login. Try again.'});
-            }
-
-        }
-    }catch(err){
-        res.status(500).json({message:'Could not login. Try again.'});
-    }
-});
-
-router.post('/token', async (req,res)=>{
-    const user = await jwt.decode(req.body.token);
-    User.findByIdAndUpdate({'_id':user.userID},{$set:{status:'Active'}}).then(response=>{
-        res.json({message:'Your Email has been verified.'});
-    });
-});
 
 module.exports = router;

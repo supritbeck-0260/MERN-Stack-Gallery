@@ -1,13 +1,15 @@
 const mongoose = require('mongoose');
 
 const uploadSchema = mongoose.Schema({
+    uid:{
+        type:String,
+        require:true
+    },
     filename : {
         type: String,
-        require:true
     },
     path:{
         type: String,
-        default:'http://localhost:5000/uploads/'
     },
     about:{
         type: String,
