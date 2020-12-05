@@ -1,7 +1,11 @@
 const mongoose = require('mongoose');
 
 const PostSchema = mongoose.Schema({
-    profile:{
+    name:{
+        type:String,
+        require:true
+    },
+    filename:{
         type:String,
     },
     camera:{
@@ -18,7 +22,6 @@ const PostSchema = mongoose.Schema({
     },
     date: {
         type: Number,
-        default: new Date().getTime()
     }
 });
 

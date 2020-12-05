@@ -4,7 +4,6 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 require('dotenv/config');
-const authorization = require('./middleware/Authorization');
 app.use(cors());
 const postsRoute = require('./Routes/post');
 const LoginSignUp =  require('./Routes/LoginSignUp');

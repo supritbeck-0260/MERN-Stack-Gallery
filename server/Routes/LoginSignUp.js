@@ -1,5 +1,6 @@
 const express = require('express');
 const User = require('../Modals/user');
+const Profile = require('../Modals/profileInfo');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -87,7 +88,6 @@ router.post('/login', async (req,res)=>{
 });
 router.get('/logout',async (req,res)=>{
     const token = req.headers.authorization;
-    console.log(jwt.verify(token,process.env.SECRET_KEY));
 });
 router.post('/token', async (req,res)=>{
     let user;
@@ -99,9 +99,15 @@ router.post('/token', async (req,res)=>{
     if(user){
         let findUser;
         try {
-            findUser = await User.findByIdAndUpdate({'_id':1111},{$set:{status:'Active'}});
+            findUser = await User.findByIdAndUpdate({'_id':user.userID},{$set:{status:'Active'}});
             if(findUser){
                 res.json({message:'Your Email has been verified.'});
+                const profile = new Profile({
+                    _id:findUser._id,
+                    name:findUser.name,
+                    date: new Date(),
+                });
+                profile.save();
                }else{
                 res.status(201).json({message:'Email verification falied. Please try again.'});
                }

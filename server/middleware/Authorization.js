@@ -1,13 +1,14 @@
 const jwt = require('jsonwebtoken');
 require('dotenv/config');
-const User = require('../Modals/user');
+const Profile = require('../Modals/profileInfo');
 
 const authorization = async (req,res,next)=>{
 
     try {
         const token = req.headers.authorization;
         const user = await jwt.verify(token,process.env.SECRET_KEY);
-        req.user = User.findOne({_id:user.userID});
+        const findUser = await Profile.findOne({_id:user.userID});
+        req.user = findUser;
         next();
 
     } catch (error) {

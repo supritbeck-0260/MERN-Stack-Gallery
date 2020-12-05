@@ -6,6 +6,7 @@ const multer = require('multer');
 const webp=require('webp-converter');
 require('dotenv/config');
 const authorization = require('../middleware/Authorization');
+const { route } = require('./LoginSignUp');
 const compression = (type,name) =>{
     return webp.cwebp(`./public/${type}Org/${name}`,`./public/${type+(type=='upload'?'s':'')}/${name}`,"-q 80");
 }
@@ -31,17 +32,51 @@ const profileUpload = multer({
     storage:StorageProfile
 }).single('profile');
 
-router.get('/profile/info/fetch',async (req,res)=>{
-    console.log('Get Request..');
+router.post('/profile/info/fetch',async (req,res)=>{
     try{
-        const posts = await Profile.findById({"_id":"5f4b2d6d66faff47dce1cdf9"});
+        const posts = await Profile.findById({"_id":req.body.id});
         res.json(posts);
     }catch(err){
         res.json({message:err});
     }
     
 });
-
+router.post('/profile/picture/update',[authorization,profileUpload],async (req,res)=>{
+    const post={
+        filename:req.file.filename,
+    }
+    compression('profile',req.file.filename).then(resp=>{
+    Profile.findByIdAndUpdate({"_id":req.user._id},{$set:post})
+    .then((response)=>{
+        res.json(response);
+    });
+    });
+    const update = {
+        avatar:req.file.filename
+    }
+    console.log(req.user._id);
+    Upload.updateMany({uid:req.user._id},update,(err,result)=>{
+        if(err){
+            console.log(err);
+        }else{
+            console.log('Upload Updated');
+        }
+    });
+});
+router.post('/profile/images', async (req,res)=>{
+    try {
+        const upload  = await Upload.find({uid:req.body.id});
+        if(upload){
+            res.json(upload);
+        }else{
+            res.status('201').json({message:'No recored found'});
+        }
+    } catch (error) {
+        res.status('201').json('Server Error.');
+    }
+    
+    
+});
 router.post('/getpics',async (req,res)=>{
     const offset = req.body.offset;
     try{
@@ -64,18 +99,8 @@ router.post('/get/one',async (req,res)=>{
     
 });
 
-router.post('/profilepic',profileUpload,async (req,res)=>{
-    const post={
-        profile:req.file.filename,
-    }
-    compression('profile',req.file.filename).then(resp=>{
-    Profile.findByIdAndUpdate({"_id":"5f4b2d6d66faff47dce1cdf9"},{$set:post})
-    .then((response)=>{
-        res.json(response);
-    });
-    });
-});
-router.post('/profile/info/update',async (req,res)=>{
+
+router.post('/profile/info/update',authorization,async (req,res)=>{
     const post = {
         camera: req.body.camera,
         lenses: req.body.lenses,
@@ -83,7 +108,7 @@ router.post('/profile/info/update',async (req,res)=>{
         others: req.body.others,
         location: req.body.location,
     };
-    Profile.findByIdAndUpdate({"_id":"5f4b2d6d66faff47dce1cdf9"},{$set:post})
+    Profile.findByIdAndUpdate({"_id":req.user._id},{$set:post})
 .then((response)=>{
     res.json(response);
 });
@@ -92,23 +117,31 @@ router.post('/profile/info/update',async (req,res)=>{
 
 router.post('/upload',[authorization,upload], async (req,res) =>{
     const info = JSON.parse(req.body.info);
-    const upload = new Upload({
-        filename:req.file.filename,
-        about: info.about,
-        camera: info.camera,
-        lenses: info.lenses,
-        editing: info.editing,
-        others: info.others,
-        location: info.location,
-        date: Date.now()
-    });
-    compression('upload',req.file.filename).then(resp=>{
-        upload.save().then(response=>{
-            res.json(response);
-        }).catch(err=>{
-            res.json({message:err});
+    let upload;
+    try {
+            upload = new Upload({
+            uid:req.user._id,
+            owner:req.user.name,
+            filename:req.file.filename,
+            avatar:req.user.filename,
+            about: info.about,
+            camera: info.camera,
+            lenses: info.lenses,
+            editing: info.editing,
+            others: info.others,
+            location: info.location,
+            date: Date.now()
         });
-    });
+        compression('upload',req.file.filename).then(resp=>{
+            upload.save().then(response=>{
+                res.json(response);
+            }).catch(err=>{
+                res.json({message:err});
+            });
+        });
+    } catch (error) {
+        res.status(201).json({message:'Server Error.'});
+    }
 });
 
 router.post('/upload/edit',authorization, async (req,res) =>{

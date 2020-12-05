@@ -5,6 +5,12 @@ const uploadSchema = mongoose.Schema({
         type:String,
         require:true
     },
+    avatar:{
+        type:String,
+    },
+    owner:{
+        type:String
+    },
     filename : {
         type: String,
         require:true
@@ -32,4 +38,4 @@ const uploadSchema = mongoose.Schema({
     }
 });
 
-module.exports = mongoose.model('newuploads',uploadSchema);
+module.exports = mongoose.model('uploads',uploadSchema);
