@@ -7,9 +7,7 @@ const uploadSchema = mongoose.Schema({
     },
     filename : {
         type: String,
-    },
-    path:{
-        type: String,
+        require:true
     },
     about:{
         type: String,

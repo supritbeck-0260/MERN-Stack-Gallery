@@ -4,9 +4,10 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 require('dotenv/config');
+const authorization = require('./middleware/Authorization');
 app.use(cors());
 const postsRoute = require('./Routes/post');
-const AuthRoutes =  require('./Routes/Authentication');
+const LoginSignUp =  require('./Routes/LoginSignUp');
 app.use('/', express.static(__dirname + '/public'));
 app.use(bodyParser.json());
 mongoose.connect(process.env.DB_CONNECTION,
@@ -18,6 +19,6 @@ mongoose.connect(process.env.DB_CONNECTION,
 mongoose.set('useFindAndModify', false);
 
 app.use('/',postsRoute);
-app.use('/auth',AuthRoutes);
+app.use('/auth',LoginSignUp);
 
 app.listen(5000,()=>{console.log("server started at 5000");});

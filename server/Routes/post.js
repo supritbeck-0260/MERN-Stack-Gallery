@@ -5,7 +5,7 @@ const router = express.Router();
 const multer = require('multer');
 const webp=require('webp-converter');
 require('dotenv/config');
-
+const authorization = require('../middleware/Authorization');
 const compression = (type,name) =>{
     return webp.cwebp(`./public/${type}Org/${name}`,`./public/${type+(type=='upload'?'s':'')}/${name}`,"-q 80");
 }
@@ -90,10 +90,10 @@ router.post('/profile/info/update',async (req,res)=>{
    
 });
 
-router.post('/upload',upload, async (req,res) =>{
+router.post('/upload',[authorization,upload], async (req,res) =>{
     const info = JSON.parse(req.body.info);
     const upload = new Upload({
-        path:process.env.UPLOAD_PATH+req.file.filename,
+        filename:req.file.filename,
         about: info.about,
         camera: info.camera,
         lenses: info.lenses,
@@ -111,7 +111,7 @@ router.post('/upload',upload, async (req,res) =>{
     });
 });
 
-router.post('/upload/edit', async (req,res) =>{
+router.post('/upload/edit',authorization, async (req,res) =>{
     const edit = {
         about: req.body.about,
         camera: req.body.camera,
@@ -127,9 +127,9 @@ router.post('/upload/edit', async (req,res) =>{
     });
 });
 
-router.post('/upload/delete', async (req,res)=>{
+router.post('/upload/delete',authorization, async (req,res)=>{
     Upload.findByIdAndDelete({"_id":req.body.id}).then(response=>{
-        res.json("Picture Deleted");
+        res.json({message:"Picture Deleted"});
     }).catch(err=>{
         res.json({message:err});
     });

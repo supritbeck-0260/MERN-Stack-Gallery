@@ -85,6 +85,10 @@ router.post('/login', async (req,res)=>{
         res.status(500).json({message:'Could not login. Try again.'});
     }
 });
+router.get('/logout',async (req,res)=>{
+    const token = req.headers.authorization;
+    console.log(jwt.verify(token,process.env.SECRET_KEY));
+});
 router.post('/token', async (req,res)=>{
     let user;
     try{
