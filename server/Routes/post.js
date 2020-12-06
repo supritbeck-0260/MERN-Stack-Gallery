@@ -45,23 +45,22 @@ router.post('/profile/picture/update',[authorization,profileUpload],async (req,r
     const post={
         filename:req.file.filename,
     }
-    compression('profile',req.file.filename).then(resp=>{
-    Profile.findByIdAndUpdate({"_id":req.user._id},{$set:post})
-    .then((response)=>{
-        res.json(response);
-    });
-    });
-    const update = {
-        avatar:req.file.filename
-    }
-    console.log(req.user._id);
-    Upload.updateMany({uid:req.user._id},update,(err,result)=>{
-        if(err){
-            console.log(err);
-        }else{
-            console.log('Upload Updated');
-        }
-    });
+        compression('profile',req.file.filename).then(resp=>{
+            Profile.findByIdAndUpdate({"_id":req.user._id},{$set:post})
+            .then((response)=>{
+                res.json(response);
+            });
+            });
+            const update = {
+                avatar:req.file.filename
+            }
+            Upload.updateMany({uid:req.user._id},update,(err,result)=>{
+                if(err){
+                    console.log(err);
+                }else{
+                    console.log('Upload Updated');
+                }
+            });
 });
 router.post('/profile/images', async (req,res)=>{
     try {
@@ -101,17 +100,22 @@ router.post('/get/one',async (req,res)=>{
 
 
 router.post('/profile/info/update',authorization,async (req,res)=>{
-    const post = {
-        camera: req.body.camera,
-        lenses: req.body.lenses,
-        editing: req.body.editing,
-        others: req.body.others,
-        location: req.body.location,
-    };
-    Profile.findByIdAndUpdate({"_id":req.user._id},{$set:post})
-.then((response)=>{
-    res.json(response);
-});
+        const post = {
+            camera: req.body.camera,
+            lenses: req.body.lenses,
+            editing: req.body.editing,
+            others: req.body.others,
+        };
+        if((req.body.id).toString() === (req.user._id).toString()){
+            Profile.findByIdAndUpdate({"_id":req.user._id},{$set:post})
+            .then((response)=>{
+                res.json(response);
+            });
+        }else{
+            res.status(201).json({message:'Forbidden Access.'});
+        }
+        
+    
    
 });
 
@@ -153,19 +157,28 @@ router.post('/upload/edit',authorization, async (req,res) =>{
         others: req.body.others,
         location: req.body.location,
     };
-    Upload.findByIdAndUpdate({"_id":req.body.id},{$set:edit}).then(response=>{
-        res.json(response);
-    }).catch(err=>{
-        res.json({message:err});
-    });
+    if((req.body.uid).toString() === (req.user._id).toString()){
+        Upload.findByIdAndUpdate({"_id":req.body.id},{$set:edit}).then(response=>{
+            res.json(response);
+        }).catch(err=>{
+            res.json({message:err});
+        });
+    }else{
+        res.status('201').json('Forbidden Access.');
+    }
+    
 });
 
 router.post('/upload/delete',authorization, async (req,res)=>{
-    Upload.findByIdAndDelete({"_id":req.body.id}).then(response=>{
-        res.json({message:"Picture Deleted"});
-    }).catch(err=>{
-        res.json({message:err});
-    });
+    if((req.body.uid).toString() === (req.user._id).toString()){
+        Upload.findByIdAndDelete({"_id":req.body.id}).then(response=>{
+            res.json({message:"Picture Deleted"});
+        }).catch(err=>{
+            res.json({message:err});
+        });
+    }else{
+        res.status('201').json('Forbidden Access.');
+    }
 });
 
 
