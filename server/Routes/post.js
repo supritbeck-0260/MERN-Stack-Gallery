@@ -6,7 +6,6 @@ const multer = require('multer');
 const webp=require('webp-converter');
 require('dotenv/config');
 const authorization = require('../middleware/Authorization');
-const { route } = require('./LoginSignUp');
 const compression = (type,name) =>{
     return webp.cwebp(`./public/${type}Org/${name}`,`./public/${type+(type=='upload'?'s':'')}/${name}`,"-q 80");
 }
@@ -37,7 +36,7 @@ router.post('/profile/info/fetch',async (req,res)=>{
         const posts = await Profile.findById({"_id":req.body.id});
         res.json(posts);
     }catch(err){
-        res.json({message:err});
+        res.status(201).json({message:'User Not Found.'});
     }
     
 });
@@ -65,7 +64,7 @@ router.post('/profile/picture/update',[authorization,profileUpload],async (req,r
 router.post('/profile/images', async (req,res)=>{
     try {
         const upload  = await Upload.find({uid:req.body.id});
-        if(upload){
+        if(upload.length){
             res.json(upload);
         }else{
             res.status('201').json({message:'No recored found'});
@@ -93,7 +92,7 @@ router.post('/get/one',async (req,res)=>{
         const posts = await Upload.findOne({_id:id});
         res.json(posts);
     }catch(err){
-        res.json({message:err});
+        res.status(201).json({message:'Image Not Found'});
     }
     
 });

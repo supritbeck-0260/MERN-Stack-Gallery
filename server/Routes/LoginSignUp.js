@@ -74,7 +74,7 @@ router.post('/login', async (req,res)=>{
                 }
                 else if(isValidPassword && findUser.status=='Active'){
                     let token;
-                    token = jwt.sign({userID:findUser.id},process.env.SECRET_KEY,{expiresIn:'1h'});
+                    token = jwt.sign({userID:findUser.id},process.env.SECRET_KEY,{expiresIn:'24h'});
                     res.json({message:'Welcome to Proclick.',token:token,userID:findUser.id});                    
                 }
             } catch (error) {
