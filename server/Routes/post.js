@@ -104,6 +104,7 @@ router.post('/profile/info/update',authorization,async (req,res)=>{
             lenses: req.body.lenses,
             editing: req.body.editing,
             others: req.body.others,
+            about:req.body.about,
         };
         if((req.body.id).toString() === (req.user._id).toString()){
             Profile.findByIdAndUpdate({"_id":req.user._id},{$set:post})
@@ -113,9 +114,7 @@ router.post('/profile/info/update',authorization,async (req,res)=>{
         }else{
             res.status(201).json({message:'Forbidden Access.'});
         }
-        
-    
-   
+ 
 });
 
 router.post('/upload',[authorization,upload], async (req,res) =>{

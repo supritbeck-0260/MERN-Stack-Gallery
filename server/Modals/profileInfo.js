@@ -5,6 +5,9 @@ const PostSchema = mongoose.Schema({
         type:String,
         require:true
     },
+    about:{
+        type:String,
+    },
     filename:{
         type:String,
     },
