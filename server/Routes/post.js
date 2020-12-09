@@ -1,11 +1,13 @@
 const express = require('express');
 const Profile = require('../Modals/profileInfo');
 const Upload = require('../Modals/upload');
+const Image = require('../Modals/image');
 const router = express.Router();
 const multer = require('multer');
 const webp=require('webp-converter');
 require('dotenv/config');
 const authorization = require('../middleware/Authorization');
+const { response } = require('express');
 const compression = (type,name) =>{
     return webp.cwebp(`./public/${type}Org/${name}`,`./public/${type+(type=='upload'?'s':'')}/${name}`,"-q 80");
 }
@@ -86,11 +88,57 @@ router.post('/getpics',async (req,res)=>{
     
 });
 
+router.post('/image/rate',authorization, async (req,res)=>{
+    const post = {
+        uid: req.user._id,
+        rate: req.body.rate,
+        date: Date.now()
+    }
+    try {
+        const image = await Image.findOne({'_id':req.body.id});
+        if(image){
+            const find= image.ratings.findIndex((rate)=> rate.uid == req.user._id);
+            if(find != -1){
+                image.ratings[find] = post;
+                image.save().then(response=>{
+                    res.json({message:'rated-'+req.body.rate});
+                });
+            }else{
+                image.ratings.push(post);
+                image.save().then(response=>{
+                    res.json({message:'rated'+req.body.rate});
+                });
+            }
+        }else{
+        const image = new Image({
+                _id:req.body.id,
+                ratings:[post]
+            });
+        image.save().then(response=>{
+                res.json({message:'rated-'+req.body.rate});
+            }); 
+        }
+    } catch (error) {
+      res.status(201).json({message:'Server Error.'});  
+    }
+});
 router.post('/get/one',async (req,res)=>{
     const id=req.body.id;
     try{
         const posts = await Upload.findOne({_id:id});
-        res.json(posts);
+        if(req.body.uid){
+            const image = await Image.findOne({_id:id});
+            if(image && image.ratings.length){
+                const rate = image.ratings.find((rate)=>rate.uid==req.body.uid);
+                res.json({info:posts,rate:rate?rate.rate:null});
+            }else{
+                res.json({info:posts});
+            }
+
+        }else{
+            res.json({info:posts});
+        }
+
     }catch(err){
         res.status(201).json({message:'Image Not Found'});
     }
@@ -137,6 +185,10 @@ router.post('/upload',[authorization,upload], async (req,res) =>{
         compression('upload',req.file.filename).then(resp=>{
             upload.save().then(response=>{
                 res.json(response);
+                const image = new Image({
+                    _id:upload._id
+                });
+                image.save();
             }).catch(err=>{
                 res.json({message:err});
             });
