@@ -47,7 +47,7 @@ router.post('/profile/picture/update',[authorization,profileUpload],async (req,r
         compression('profile',req.file.filename).then(resp=>{
             Profile.findByIdAndUpdate({"_id":req.user._id},{$set:post})
             .then((response)=>{
-                res.json(response);
+                res.json({filename:req.file.filename});
             });
             });
             const update = {
@@ -63,7 +63,7 @@ router.post('/profile/picture/update',[authorization,profileUpload],async (req,r
 });
 router.post('/profile/images', async (req,res)=>{
     try {
-        const upload  = await Upload.find({uid:req.body.id});
+        const upload  = await Upload.find({uid:req.body.id}).sort({'date':-1});
         if(upload.length){
             res.json(upload);
         }else{

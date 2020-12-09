@@ -59,6 +59,7 @@ router.post('/signup', async (req,res)=>{
 
 router.post('/login', async (req,res)=>{
     let findUser;
+    let profile;
     let isValidPassword = false;
     try{
         findUser = await User.findOne({email:req.body.email});
@@ -74,8 +75,9 @@ router.post('/login', async (req,res)=>{
                 }
                 else if(isValidPassword && findUser.status=='Active'){
                     let token;
+                    profile = await Profile.findOne({'_id':findUser.id});
                     token = jwt.sign({userID:findUser.id},process.env.SECRET_KEY,{expiresIn:'24h'});
-                    res.json({message:'Welcome to Proclick.',token:token,userID:findUser.id});                    
+                    res.json({message:'Welcome to Proclick.',token:token,userID:findUser.id,avatar:profile.filename});                    
                 }
             } catch (error) {
                 res.status(500).json({message:'Could not login. Try again.'});
