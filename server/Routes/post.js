@@ -101,12 +101,28 @@ router.post('/image/rate',authorization, async (req,res)=>{
             if(find != -1){
                 image.ratings[find] = post;
                 image.save().then(response=>{
-                    res.json({message:'rated-'+req.body.rate});
+                    const length = image.ratings.length;
+                    const avg = image.ratings.reduce((total,curr)=>total+curr.rate,0)/length; 
+                    const avgRate={
+                            rate:avg,
+                            total:length
+                        }
+                     Upload.findOneAndUpdate({'_id':req.body.id},{$set:{avgRate:avgRate}}).then(response=>{
+                         res.json({rating:avgRate});
+                     });;
                 });
             }else{
                 image.ratings.push(post);
                 image.save().then(response=>{
-                    res.json({message:'rated'+req.body.rate});
+                    const length = image.ratings.length;
+                    const avg = image.ratings.reduce((total,curr)=>total+curr.rate,0)/length; 
+                    const avgRate={
+                            rate:avg,
+                            total:length
+                        }
+                     Upload.findOneAndUpdate({'_id':req.body.id},{$set:{avgRate:avgRate}}).then(response=>{
+                         res.json({rating:avgRate});
+                     });
                 });
             }
         }else{
@@ -222,9 +238,11 @@ router.post('/upload/edit',authorization, async (req,res) =>{
 router.post('/upload/delete',authorization, async (req,res)=>{
     if((req.body.uid).toString() === (req.user._id).toString()){
         Upload.findByIdAndDelete({"_id":req.body.id}).then(response=>{
-            res.json({message:"Picture Deleted"});
+            Image.findByIdAndDelete({"_id":req.body.id}).then(response=>{
+                res.json({message:"Picture Deleted"}); 
+            });
         }).catch(err=>{
-            res.json({message:err});
+            res.json({message:'Failed'});
         });
     }else{
         res.status('201').json('Forbidden Access.');

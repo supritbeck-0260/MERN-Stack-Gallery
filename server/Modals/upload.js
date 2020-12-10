@@ -18,6 +18,9 @@ const uploadSchema = mongoose.Schema({
     about:{
         type: String,
     },
+    avgRate:{
+        type: Object
+    },
     camera:{
         type: String,
     },
