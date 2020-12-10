@@ -138,10 +138,44 @@ router.post('/image/rate',authorization, async (req,res)=>{
       res.status(201).json({message:'Server Error.'});  
     }
 });
+router.post('/image/comment/post',authorization, async (req,res)=>{
+    const post = {
+        uid:req.user._id,
+        user:{
+            name:req.user.name,
+            avatar:req.user.filename
+        },
+        comment:req.body.comment,
+        date:Date.now()
+    }
+    const image = await Image.findOne({"_id":req.body.id});
+    if(image){
+       image.comments.push(post);
+       image.save().then(response=>{
+        res.json(response.comments);
+       });
+    }
+
+});
+
+router.post('/image/comment/get', async (req,res)=>{
+    try {
+      const image = await Image.findOne({'_id':req.body.id});
+      if(image){
+            res.json(image.comments);
+       }else{
+            res.status(201).json({message:'No comments found'})
+        } 
+    } catch (error) {
+        res.status(201).json({message:'Server Error'});
+    }
+
+});
 router.post('/get/one',async (req,res)=>{
     const id=req.body.id;
     try{
         const posts = await Upload.findOne({_id:id});
+        if(posts){
         if(req.body.uid){
             const image = await Image.findOne({_id:id});
             if(image && image.ratings.length){
@@ -154,6 +188,9 @@ router.post('/get/one',async (req,res)=>{
         }else{
             res.json({info:posts});
         }
+    }else{
+        res.status(201).json({message:'Image not Found'});
+    }
 
     }catch(err){
         res.status(201).json({message:'Image Not Found'});

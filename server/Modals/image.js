@@ -2,10 +2,10 @@ const mongoose = require('mongoose');
 
 const userSchema = mongoose.Schema({
     ratings:[
-        {uid:String,rate:Number,date:String}
+        {uid:String,rate:Number,date:Number}
     ],
     comments:[
-        {uid:String,comment:String,date:String,}
+        {uid:String,user:Object,comment:String,date:Number}
     ]
 });
 
