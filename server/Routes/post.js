@@ -152,7 +152,8 @@ router.post('/image/comment/post',authorization, async (req,res)=>{
     if(image){
        image.comments.push(post);
        image.save().then(response=>{
-        res.json(response.comments);
+        const sorted = response.comments.sort((a,b)=>b.date-a.date);
+        res.json(sorted);
        });
     }
 
@@ -162,7 +163,8 @@ router.post('/image/comment/get', async (req,res)=>{
     try {
       const image = await Image.findOne({'_id':req.body.id});
       if(image){
-            res.json(image.comments);
+         const sorted = image.comments.sort((a,b)=>b.date-a.date);
+            res.json(sorted);
        }else{
             res.status(201).json({message:'No comments found'})
         } 
