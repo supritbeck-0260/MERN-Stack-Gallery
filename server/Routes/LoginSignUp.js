@@ -4,6 +4,7 @@ const Profile = require('../Modals/profileInfo');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const Notify = require('../Modals/notification');
 const sender = require('../mail/send');
 require('dotenv/config');
 
@@ -110,6 +111,10 @@ router.post('/token', async (req,res)=>{
                     date: new Date(),
                 });
                 profile.save();
+                const notify = new Notify({
+                    _id:findUser._id,
+                });
+                notify.save();
                }else{
                 res.status(201).json({message:'Email verification falied. Please try again.'});
                }

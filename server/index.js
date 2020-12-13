@@ -3,8 +3,11 @@ const app = express();
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const Notification = require('./Routes/Notification');
+const socket = require('./Socket/socket');
 require('dotenv/config');
 app.use(cors());
+
 const postsRoute = require('./Routes/post');
 const LoginSignUp =  require('./Routes/LoginSignUp');
 app.use('/', express.static(__dirname + '/public'));
@@ -16,8 +19,9 @@ mongoose.connect(process.env.DB_CONNECTION,
     console.log("DB Connected..");
 });
 mongoose.set('useFindAndModify', false);
-
 app.use('/',postsRoute);
 app.use('/auth',LoginSignUp);
+app.use('/notification',Notification);
 
-app.listen(process.env.PORT || 5000,()=>{console.log("server started...");});
+const server = app.listen(process.env.PORT || 5000,()=>{console.log("server started...");});
+socket(server);

@@ -2,12 +2,13 @@ const express = require('express');
 const Profile = require('../Modals/profileInfo');
 const Upload = require('../Modals/upload');
 const Image = require('../Modals/image');
+const Notify = require('../Modals/notification');
 const router = express.Router();
 const multer = require('multer');
 const webp=require('webp-converter');
 require('dotenv/config');
 const authorization = require('../middleware/Authorization');
-const { response } = require('express');
+const user = require('../Modals/user');
 const compression = (type,name) =>{
     return webp.cwebp(`./public/${type}Org/${name}`,`./public/${type+(type=='upload'?'s':'')}/${name}`,"-q 80");
 }
@@ -100,16 +101,29 @@ router.post('/image/rate',authorization, async (req,res)=>{
             const find= image.ratings.findIndex((rate)=> rate.uid == req.user._id);
             if(find != -1){
                 image.ratings[find] = post;
-                image.save().then(response=>{
+                image.save().then(async response=>{
                     const length = image.ratings.length;
                     const avg = image.ratings.reduce((total,curr)=>total+curr.rate,0)/length; 
                     const avgRate={
                             rate:avg,
                             total:length
                         }
-                     Upload.findOneAndUpdate({'_id':req.body.id},{$set:{avgRate:avgRate}}).then(response=>{
+                    Upload.findOneAndUpdate({'_id':req.body.id},{$set:{avgRate:avgRate}}).then( async response=>{
                          res.json({rating:avgRate});
-                     });;
+                         const postNotify = {
+                            name:req.user.name,
+                            uid:req.user._id,
+                            avatar:req.user.filename,
+                            iid:req.body.id,
+                            rate:req.body.rate,
+                            filename:response.filename,
+                            checked:false,
+                            date:Date.now()
+                        };
+                        const notify =await Notify.findOne({'_id':response.uid});
+                        notify.notification.push(postNotify);
+                        notify.save();
+                     });
                 });
             }else{
                 image.ratings.push(post);
@@ -120,8 +134,22 @@ router.post('/image/rate',authorization, async (req,res)=>{
                             rate:avg,
                             total:length
                         }
-                     Upload.findOneAndUpdate({'_id':req.body.id},{$set:{avgRate:avgRate}}).then(response=>{
+                     Upload.findOneAndUpdate({'_id':req.body.id},{$set:{avgRate:avgRate}}).then(async response=>{
                          res.json({rating:avgRate});
+                         const postNotify = {
+                            name:req.user.name,
+                            uid:req.user._id,
+                            avatar:req.user.filename,
+                            iid:req.body.id,
+                            rate:req.body.rate,
+                            filename:response.filename,
+                            checked:false,
+                            date:Date.now()
+                        };
+                        const notify =await Notify.findOne({'_id':response.uid});
+                        notify.notification.push(postNotify);
+                        notify.save();
+                         
                      });
                 });
             }
@@ -151,9 +179,22 @@ router.post('/image/comment/post',authorization, async (req,res)=>{
     const image = await Image.findOne({"_id":req.body.id});
     if(image){
        image.comments.push(post);
-       image.save().then(response=>{
+       image.save().then(async response=>{
         const sorted = response.comments.sort((a,b)=>b.date-a.date);
         res.json(sorted);
+        const findUser = await Upload.findOne({'_id':req.body.id});
+        const postNotify = {
+            name:req.user.name,
+            uid:req.user._id,
+            avatar:req.user.filename,
+            iid:req.body.id,
+            filename:findUser.filename,
+            checked:false,
+            date:Date.now()
+        };
+        const notify =await Notify.findOne({'_id':findUser.uid});
+        notify.notification.push(postNotify);
+        notify.save();
        });
     }
 
