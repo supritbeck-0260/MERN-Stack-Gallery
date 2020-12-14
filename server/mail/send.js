@@ -9,7 +9,7 @@ const sender = async (user) =>{
         to: user.email,
         subject: 'Email verification',
         html: `<h1> Hi ${user.name}</h1>, </br><p>Please click on the link to verify your email.</p>
-        </br>http://localhost:3000/token/${token}`
+        </br>${process.env.CLIENT_URL}/token/${token}`
       };
       return mailer.sendMail(mailOptions);
 }
