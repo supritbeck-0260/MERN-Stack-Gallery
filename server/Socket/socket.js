@@ -6,13 +6,14 @@ const     io = require('socket.io')(server, {
       });
     io.on("connection",(socket)=>{
         console.log('Socket connection is made...');
-        
-        socket.on('online',(uid)=>{
-            console.log(uid);
-        });
-        io.on('disconnect',()=>{
-            console.log('user left');
+        socket.on('SendData',(uid)=>{
+            if(uid){
+              io.emit(uid,Math.random());
+            }
         });
     });
+    io.on('disconnect',()=>{
+      console.log('user left');
+  });
 }
 module.exports = socket;

@@ -121,8 +121,14 @@ router.post('/image/rate',authorization, async (req,res)=>{
                             date:Date.now()
                         };
                         const notify =await Notify.findOne({'_id':response.uid});
-                        notify.notification.push(postNotify);
-                        notify.save();
+                        const indexNum = notify.notification.findIndex(value=>(value.iid==req.body.id && value.uid==req.user._id && value.rate));
+                        if(indexNum != -1){
+                            notify.notification[indexNum] = postNotify;
+                            notify.save();
+                        }else{
+                            notify.notification.push(postNotify);
+                            notify.save();
+                        }
                      });
                 });
             }else{
@@ -147,9 +153,14 @@ router.post('/image/rate',authorization, async (req,res)=>{
                             date:Date.now()
                         };
                         const notify =await Notify.findOne({'_id':response.uid});
-                        notify.notification.push(postNotify);
-                        notify.save();
-                         
+                        const indexNum = notify.notification.findIndex(value=>(value.iid==req.body.id && value.uid==req.user._id && value.rate));
+                        if(indexNum != -1){
+                            notify.notification[indexNum] = postNotify;
+                            notify.save();
+                        }else{
+                            notify.notification.push(postNotify);
+                            notify.save();
+                        }
                      });
                 });
             }
