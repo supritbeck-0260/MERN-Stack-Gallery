@@ -8,7 +8,7 @@ const multer = require('multer');
 const webp=require('webp-converter');
 require('dotenv/config');
 const authorization = require('../middleware/Authorization');
-const user = require('../Modals/user');
+// const user = require('../Modals/user');
 const compression = (type,name) =>{
     return webp.cwebp(`./public/${type}Org/${name}`,`./public/${type+(type=='upload'?'s':'')}/${name}`,"-q 80");
 }

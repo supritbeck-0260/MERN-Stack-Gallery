@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const Notification = require('./Routes/Notification');
+const hits = require('./Routes/hits');
 const socket = require('./Socket/socket');
 require('dotenv/config');
 app.use(cors());
@@ -21,6 +22,7 @@ mongoose.connect(process.env.DB_CONNECTION,
 mongoose.set('useFindAndModify', false);
 app.use('/',postsRoute);
 app.use('/auth',LoginSignUp);
+app.use('/hits',hits);
 app.use('/notification',Notification);
 
 const server = app.listen(process.env.PORT || 5000,()=>{console.log("server started...");});
