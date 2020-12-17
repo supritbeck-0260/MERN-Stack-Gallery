@@ -7,7 +7,11 @@ router.get('/', async (req,res)=>{
     try {
     const gather =await Upload.find();
         if(gather){
-            const sorted = gather.sort((a,b)=>b.avgRate.rate-a.avgRate.rate);
+            const sorted = gather.sort((a,b)=>{
+                if(b.avgRate && a.avgRate){
+                  return (b.avgRate.rate-a.avgRate.rate);
+                }
+            });
             const limited = sorted.slice(0,10);
             res.json(limited);
         }else{
