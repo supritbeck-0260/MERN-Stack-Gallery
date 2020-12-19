@@ -1,13 +1,13 @@
 const express = require('express');
 const User = require('../Modals/user');
 const Profile = require('../Modals/profileInfo');
+const Mentor = require('../Modals/mentor');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Notify = require('../Modals/notification');
 const sender = require('../mail/send');
 const passwordReset = require('../mail/passwordReset');
-const authorization = require('../middleware/Authorization');
 require('dotenv/config');
 
 router.post('/signup', async (req,res)=>{
@@ -29,10 +29,10 @@ router.post('/signup', async (req,res)=>{
               sender({id:updatedUser.id,name:name,email:email}).then(response=>{
                   res.status(200).json({message:'Email sent to '+response.accepted[0]+ '. Please verify your Email ID.'});
               }).catch (error=>{
-                    res.status(201).json({message:'Falied to Sign up. Please try again.'}); 
+                    res.status(201).json({message:error}); 
               }); 
            } catch (error) {
-            res.status(201).json({message:'Falied to Sign up. Please try again.'}); 
+            res.status(201).json({message:error}); 
            }
        }else if(existingUser == null){
             const user = new User({
@@ -91,9 +91,6 @@ router.post('/login', async (req,res)=>{
         res.status(500).json({message:'Could not login. Try again.'});
     }
 });
-router.get('/logout',async (req,res)=>{
-    const token = req.headers.authorization;
-});
 router.post('/token', async (req,res)=>{
     let user;
     try{
@@ -113,10 +110,10 @@ router.post('/token', async (req,res)=>{
                     date: new Date(),
                 });
                 profile.save();
-                const notify = new Notify({
-                    _id:findUser._id,
-                });
+                const notify = new Notify({_id:findUser._id});
                 notify.save();
+                const mentor = new Mentor({_id:findUser._id});
+                mentor.save();
                }else{
                 res.status(201).json({message:'Email verification falied. Please try again.'});
                }

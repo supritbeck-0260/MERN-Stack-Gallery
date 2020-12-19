@@ -3,12 +3,12 @@ const Profile = require('../Modals/profileInfo');
 const Upload = require('../Modals/upload');
 const Image = require('../Modals/image');
 const Notify = require('../Modals/notification');
+const Mentor = require('../Modals/mentor');
 const router = express.Router();
 const multer = require('multer');
 const webp=require('webp-converter');
 require('dotenv/config');
 const authorization = require('../middleware/Authorization');
-// const user = require('../Modals/user');
 const compression = (type,name) =>{
     return webp.cwebp(`./public/${type}Org/${name}`,`./public/${type+(type=='upload'?'s':'')}/${name}`,"-q 80");
 }
@@ -37,7 +37,21 @@ const profileUpload = multer({
 router.post('/profile/info/fetch',async (req,res)=>{
     try{
         const posts = await Profile.findById({"_id":req.body.id});
-        res.json(posts);
+        const {name,about,filename,camera,lenses,editing,others,date,_id} = posts;
+        if(req.body.id == req.body.myuid){
+            const findMy = await Mentor.findById({"_id":req.body.myuid});
+            const mentors =  findMy.mentors.length;
+            const mentoring = findMy.mentoring.length;
+            res.json({_id,name,about,filename,camera,lenses,editing,others,date,mentoring,mentors});
+        }else{
+            const findUser =await Mentor.findById({"_id":req.body.id});
+            const mentoring = findUser.mentoring.length;
+            let isMentor = false;
+            if(req.body.myuid && mentoring){
+            isMentor =  (findUser.mentoring.find((value)=>value.uid == req.body.myuid) != undefined);
+            }
+            res.json({_id,name,about,filename,camera,lenses,editing,others,date,mentoring,isMentor});
+        }
     }catch(err){
         res.status(201).json({message:'User Not Found.'});
     }

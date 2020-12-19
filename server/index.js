@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const Notification = require('./Routes/Notification');
 const hits = require('./Routes/hits');
+const mentor = require('./Routes/mentor');
 const socket = require('./Socket/socket');
 require('dotenv/config');
 app.use(cors());
@@ -24,6 +25,7 @@ app.use('/',postsRoute);
 app.use('/auth',LoginSignUp);
 app.use('/hits',hits);
 app.use('/notification',Notification);
+app.use('/mentor',mentor);
 
 const server = app.listen(process.env.PORT || 5000,()=>{console.log("server started...");});
 socket(server);
