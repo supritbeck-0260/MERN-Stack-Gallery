@@ -3,7 +3,7 @@ const router = express.Router();
 const Mentor = require('../Modals/mentor');
 const authorization = require('../middleware/Authorization');
 const profileInfo = require('../Modals/profileInfo');
-
+const Notify = require('../Modals/notification');
 router.post('/make',authorization, async (req,res)=>{
     try {
         const findMe =await Mentor.findOne({'_id':req.user._id});
@@ -20,8 +20,26 @@ router.post('/make',authorization, async (req,res)=>{
             if(check == -1){
                 findMyMentor.mentoring.push(postToMyMentor);
                 const length = findMyMentor.mentoring.length;
-                findMyMentor.save().then(response=>{
+                findMyMentor.save().then(async response=>{
                     res.json({mentoring:length});
+                    const postNotify = {
+                        name:req.user.name,
+                        uid:req.user._id,
+                        avatar:req.user.filename,
+                        checked:false,
+                        type:'M',
+                        date:Date.now()
+                    };
+                    const notify =await Notify.findOne({'_id':req.body.id});
+                    const indexNum = notify.notification.findIndex(value=>(value.uid==req.user._id && value.type=='M'));
+                    if(indexNum != -1){
+                        notify.notification[indexNum] = postNotify;
+                        notify.save();
+                    }else{
+                        notify.notification.push(postNotify);
+                        notify.save();
+                    }
+
                 });
             }else{
                 const length = findMyMentor.mentoring.length;
@@ -51,7 +69,7 @@ router.post('/make',authorization, async (req,res)=>{
 });
 
 router.post('/remove',authorization, async (req,res)=>{
-    // try {
+    try {
         const findMyMentor = await Mentor.findById({'_id':req.body.id});
         const findMe = await Mentor.findById({'_id':req.user._id});
         findMyMentor.mentoring = findMyMentor.mentoring.filter(value=>value.uid != req.user._id);
@@ -62,9 +80,9 @@ router.post('/remove',authorization, async (req,res)=>{
         findMe.mentors = findMe.mentors.filter(value=>value.uid != req.body.id);
         findMe.save();
         res.json({mentoring:length});
-    // } catch (error) {
-    //    res.status(201).json(error); 
-    // }
+    } catch (error) {
+       res.status(201).json(error); 
+    }
 });
 
 module.exports = router;

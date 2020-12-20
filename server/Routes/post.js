@@ -132,6 +132,7 @@ router.post('/image/rate',authorization, async (req,res)=>{
                             rate:req.body.rate,
                             filename:response.filename,
                             checked:false,
+                            type:'R',
                             date:Date.now()
                         };
                         const notify =await Notify.findOne({'_id':response.uid});
@@ -164,6 +165,7 @@ router.post('/image/rate',authorization, async (req,res)=>{
                             rate:req.body.rate,
                             filename:response.filename,
                             checked:false,
+                            type:'R',
                             date:Date.now()
                         };
                         const notify =await Notify.findOne({'_id':response.uid});
@@ -215,6 +217,7 @@ router.post('/image/comment/post',authorization, async (req,res)=>{
             iid:req.body.id,
             filename:findUser.filename,
             checked:false,
+            type:'C',
             date:Date.now()
         };
         const notify =await Notify.findOne({'_id':findUser.uid});

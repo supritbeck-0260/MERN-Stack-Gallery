@@ -2,7 +2,6 @@ const express = require('express');
 const Notify = require('../Modals/notification');
 const router = express.Router();
 const authorization = require('../middleware/Authorization');
-const { response } = require('express');
 router.get('/',authorization, async (req,res)=>{
     try {
         const find = await Notify.findOne({'_id':req.user._id});

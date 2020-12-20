@@ -10,6 +10,9 @@ const notifySchema = mongoose.Schema({
         type:Boolean,
         
     },
+    type:{
+        type:String
+    },
     filename:{
         type:String
     },
