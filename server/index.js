@@ -6,6 +6,7 @@ const cors = require('cors');
 const Notification = require('./Routes/Notification');
 const hits = require('./Routes/hits');
 const mentor = require('./Routes/mentor');
+const product = require('./product/route');
 const socket = require('./Socket/socket');
 require('dotenv/config');
 app.use(cors());
@@ -26,6 +27,7 @@ app.use('/auth',LoginSignUp);
 app.use('/hits',hits);
 app.use('/notification',Notification);
 app.use('/mentor',mentor);
+app.use('/product',product);
 
 const server = app.listen(process.env.PORT || 5000,()=>{console.log("server started...");});
 socket(server);
