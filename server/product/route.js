@@ -30,5 +30,17 @@ router.post('/save',authorization, async (req,res)=>{
     }
 });
 
+router.post('/fetch',authorization, async (req,res)=>{
+    const product = await Products.find();
+    if(product){
+    const {item,name} = req.body;
+    const regex = new RegExp(name, 'i');
+    const find = product[0][item].filter(value=>regex.test(value.name));
+    res.json(find);
+    }else{
+        res.status(201).json({message:'No product fount'});
+    }
+
+});
 
 module.exports = router;
