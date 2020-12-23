@@ -16,25 +16,25 @@ const uploadSchema = mongoose.Schema({
         require:true
     },
     about:{
-        type: String,
+        type: Object,
     },
     avgRate:{
         type: Object
     },
     camera:{
-        type: String,
+        type: Object,
     },
     lenses:{
-        type: String,
+        type: Object,
     },
     editing:{
-        type: String,
+        type: Object,
     },
     others:{
-        type: String,
+        type: Object,
     },
     location:{
-        type: String,
+        type: Object,
     },
     date:{
         type: Number,

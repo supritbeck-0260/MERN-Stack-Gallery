@@ -9,6 +9,7 @@ const multer = require('multer');
 const webp=require('webp-converter');
 require('dotenv/config');
 const authorization = require('../middleware/Authorization');
+const { json } = require('body-parser');
 const compression = (type,name) =>{
     return webp.cwebp(`./public/${type}Org/${name}`,`./public/${type+(type=='upload'?'s':'')}/${name}`,"-q 80");
 }
@@ -314,7 +315,7 @@ router.post('/upload',[authorization,upload], async (req,res) =>{
                 });
                 image.save();
             }).catch(err=>{
-                res.json({message:err});
+                res.json({message:'Error saving data'});
             });
         });
     } catch (error) {
@@ -323,37 +324,46 @@ router.post('/upload',[authorization,upload], async (req,res) =>{
 });
 
 router.post('/upload/edit',authorization, async (req,res) =>{
-    const edit = {
-        about: req.body.about,
-        camera: req.body.camera,
-        lenses: req.body.lenses,
-        editing: req.body.editing,
-        others: req.body.others,
-        location: req.body.location,
-    };
-    if((req.body.uid).toString() === (req.user._id).toString()){
-        Upload.findByIdAndUpdate({"_id":req.body.id},{$set:edit}).then(response=>{
-            res.json(response);
-        }).catch(err=>{
-            res.json({message:err});
-        });
-    }else{
-        res.status('201').json('Forbidden Access.');
+    try {
+        const edit = {
+            about: req.body.about,
+            camera: req.body.camera,
+            lenses: req.body.lenses,
+            editing: req.body.editing,
+            others: req.body.others,
+            location: req.body.location,
+        };
+        if((req.body.uid).toString() === (req.user._id).toString()){
+            Upload.findByIdAndUpdate({"_id":req.body.id},{$set:edit}).then(response=>{
+                res.json(response);
+            }).catch(err=>{
+                res.json({message:err});
+            });
+        }else{
+            res.status('201').json('Forbidden Access.');
+        }       
+    } catch (error) {
+       res.status(201).json({message:'Server Error'}); 
     }
+
     
 });
 
 router.post('/upload/delete',authorization, async (req,res)=>{
-    if((req.body.uid).toString() === (req.user._id).toString()){
-        Upload.findByIdAndDelete({"_id":req.body.id}).then(response=>{
-            Image.findByIdAndDelete({"_id":req.body.id}).then(response=>{
-                res.json({message:"Picture Deleted"}); 
+    try {
+        if((req.body.uid).toString() === (req.user._id).toString()){
+            Upload.findByIdAndDelete({"_id":req.body.id}).then(response=>{
+                Image.findByIdAndDelete({"_id":req.body.id}).then(response=>{
+                    res.json({message:"Picture Deleted"}); 
+                });
+            }).catch(err=>{
+                res.json({message:'Failed'});
             });
-        }).catch(err=>{
-            res.json({message:'Failed'});
-        });
-    }else{
-        res.status('201').json('Forbidden Access.');
+        }else{
+            res.status('201').json('Forbidden Access.');
+        }
+    } catch (error) {
+        res.status(201).json({message:'Server Error'});
     }
 });
 
