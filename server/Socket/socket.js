@@ -5,14 +5,12 @@ const     io = require('socket.io')(server, {
         }
       });
     io.on("connection",(socket)=>{
-        console.log('Socket connection is made...');
         socket.on('SendData',(uid)=>{
             if(uid){
               io.emit(uid,Math.random());
             }
         });
         socket.on('newupload',(data)=>{
-          console.log(data);
             io.emit('newupload',Math.random());
       });
     });

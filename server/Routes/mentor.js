@@ -84,5 +84,16 @@ router.post('/remove',authorization, async (req,res)=>{
        res.status(201).json(error); 
     }
 });
-
+router.post('/list', async (req,res)=>{
+    try {
+        const find = await Mentor.findById({'_id':req.body.id});
+        if(find){
+            res.json(find[req.body.type]);
+        }else{
+            res.status(201).json({message:'No data found'});
+        }
+    } catch (error) {
+       res.status(201).json({message:'Server Error'}); 
+    }
+});
 module.exports = router;
