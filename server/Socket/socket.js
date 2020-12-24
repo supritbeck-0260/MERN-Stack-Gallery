@@ -11,6 +11,10 @@ const     io = require('socket.io')(server, {
               io.emit(uid,Math.random());
             }
         });
+        socket.on('newupload',(data)=>{
+          console.log(data);
+            io.emit('newupload',Math.random());
+      });
     });
     io.on('disconnect',()=>{
       console.log('user left');
