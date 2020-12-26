@@ -80,7 +80,7 @@ router.post('/login', async (req,res)=>{
                     let token;
                     profile = await Profile.findOne({'_id':findUser.id});
                     token = jwt.sign({userID:findUser.id},process.env.SECRET_KEY,{expiresIn:'24h'});
-                    res.json({message:'Welcome to Proclick.',token:token,userID:findUser.id,avatar:profile.filename});                    
+                    res.json({message:'Welcome to Proclick.',token:token,userID:findUser.id,avatar:profile.filename,name:profile.name});                    
                 }
             } catch (error) {
                 res.status(500).json({message:'Could not login. Try again.'});

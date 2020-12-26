@@ -17,7 +17,7 @@ router.post('/make',authorization, async (req,res)=>{
                 date:Date.now()
             }
             const check = findMyMentor.mentoring.findIndex(value=>value.uid ==req.user._id);
-            if(check == -1 && (findMyMentor._id == req.user._id)){
+            if(check == -1 && (findMyMentor._id != req.user._id)){
                 findMyMentor.mentoring.push(postToMyMentor);
                 const length = findMyMentor.mentoring.length;
                 findMyMentor.save().then(async response=>{

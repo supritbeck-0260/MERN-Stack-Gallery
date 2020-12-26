@@ -5,17 +5,18 @@ const     io = require('socket.io')(server, {
         }
       });
     io.on("connection",(socket)=>{
+      console.log(`${socket.id} joined.`);
         socket.on('SendData',(uid)=>{
             if(uid){
               io.emit(uid,Math.random());
             }
         });
-        socket.on('newupload',(data)=>{
+        socket.on('newupload',()=>{
             io.emit('newupload',Math.random());
       });
+      socket.on('disconnect',()=>{
+        console.log(`${socket.id} left.`)
+      });
     });
-    io.on('disconnect',()=>{
-      console.log('user left');
-  });
 }
 module.exports = socket;
