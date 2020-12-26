@@ -56,7 +56,7 @@ router.post('/make',authorization, async (req,res)=>{
                 date:Date.now()
             }
             const check = findMe.mentors.findIndex(value=>value.uid ==req.user._id);
-            if(check == -1 && (findMyMentor._id == req.user._id)){
+            if(check == -1 && (findMyMentor._id != req.user._id)){
                 findMe.mentors.push(postToMe);
                 findMe.save(); 
             }
