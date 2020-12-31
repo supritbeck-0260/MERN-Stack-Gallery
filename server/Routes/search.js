@@ -18,6 +18,7 @@ router.post('/', async (req,res)=>{
     }else{
         const find = await Upload.find();
         if(find.length){
+            if(req.body.param =='all') return res.json({filtered:find.slice(0,10),category,search:'all'});
             const filtered = find.filter(value=>{
                 if(value[category]) return regex.test(value[category].value);
                 else return false;
