@@ -21,7 +21,8 @@ router.get('/', async (req,res)=>{
                     return 0;
                 }
             });
-            const limited = sorted.slice(0,10);
+            const filtered = sorted.filter(value=>value.avgRate);
+            const limited = filtered.slice(0,10);
             res.json(limited);
         }else{
             res.json({message:'No Hits Found'});
