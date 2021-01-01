@@ -11,6 +11,9 @@ const PostSchema = mongoose.Schema({
     filename:{
         type:String,
     },
+    avgRate:{
+        type: Object
+    },
     camera:{
         type: Array,
     },

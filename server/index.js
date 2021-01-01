@@ -8,6 +8,7 @@ const hits = require('./Routes/hits');
 const mentor = require('./Routes/mentor');
 const product = require('./product/route');
 const search = require('./Routes/search');
+const ratecomment = require('./Routes/ratecomment');
 const socket = require('./Socket/socket');
 require('dotenv/config');
 app.use(cors());
@@ -30,6 +31,7 @@ app.use('/notification',Notification);
 app.use('/mentor',mentor);
 app.use('/product',product);
 app.use('/search',search);
+app.use('/image',ratecomment);
 
 const server = app.listen(process.env.PORT || 5000,()=>{console.log("server started...");});
 socket(server);
