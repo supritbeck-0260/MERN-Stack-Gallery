@@ -36,12 +36,12 @@ const profileUpload = multer({
 router.post('/profile/info/fetch',async (req,res)=>{
     try{
         const posts = await Profile.findById({"_id":req.body.id});
-        const {name,about,filename,camera,lenses,editing,others,date,_id} = posts;
+        const {name,about,filename,camera,lenses,editing,others,date,avgRate,_id} = posts;
         if(req.body.id == req.body.myuid){
             const findMy = await Mentor.findById({"_id":req.body.myuid});
             const mentors =  findMy.mentors.length;
             const mentoring = findMy.mentoring.length;
-            res.json({_id,name,about,filename,camera,lenses,editing,others,date,mentoring,mentors});
+            res.json({_id,name,about,filename,camera,lenses,editing,others,date,mentoring,mentors,avgRate});
         }else{
             const findUser =await Mentor.findById({"_id":req.body.id});
             const mentoring = findUser.mentoring.length;
@@ -49,7 +49,7 @@ router.post('/profile/info/fetch',async (req,res)=>{
             if(req.body.myuid && mentoring){
             isMentor =  (findUser.mentoring.find((value)=>value.uid == req.body.myuid) != undefined);
             }
-            res.json({_id,name,about,filename,camera,lenses,editing,others,date,mentoring,isMentor});
+            res.json({_id,name,about,filename,camera,lenses,editing,others,date,mentoring,isMentor,avgRate});
         }
     }catch(err){
         res.status(201).json({message:'User Not Found.'});

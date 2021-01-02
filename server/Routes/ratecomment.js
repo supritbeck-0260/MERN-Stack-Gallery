@@ -50,7 +50,6 @@ router.post('/rate',authorization, async (req,res)=>{
                         if(profile.avgRate){
                             const total = (previous?profile.avgRate.total:profile.avgRate.total+1);
                             const rate = (profile.avgRate.rate*profile.avgRate.total+req.body.rate-(previous?previous.rate:0))/total;
-                            console.log(rate,total);
                             profile.avgRate = {rate,total};
                         }else profile.avgRate  = {rate:req.body.rate,total:1};
                         profile.save();
