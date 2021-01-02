@@ -75,10 +75,12 @@ router.post('/comment/post',authorization, async (req,res)=>{
             name:req.user.name,
             avatar:req.user.filename
         },
-        comment:req.body.comment,
+        comment:(req.body.comment?req.body.comment.trim():req.body.comment),
         date:Date.now()
     }
-    const image = await Image.findOne({"_id":req.body.id});
+    let image;
+    if(post.comment) image = await Image.findOne({"_id":req.body.id});
+    else res.status(201).json({message:'Invalid comment'});
     if(image){
        image.comments.push(post);
        image.save().then(async response=>{
