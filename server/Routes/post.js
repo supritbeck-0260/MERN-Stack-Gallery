@@ -6,6 +6,7 @@ const Mentor = require('../Modals/mentor');
 const router = express.Router();
 const multer = require('multer');
 const webp=require('webp-converter');
+const objectTrim = require('../Functions/trim');
 require('dotenv/config');
 const authorization = require('../middleware/Authorization');
 const compression = (type,name) =>{
@@ -156,12 +157,12 @@ router.post('/upload',[authorization,upload], async (req,res) =>{
             owner:req.user.name,
             filename:req.file.filename,
             avatar:req.user.filename,
-            about: info.about,
-            camera: info.camera,
-            lenses: info.lenses,
-            editing: info.editing,
-            others: info.others,
-            location: info.location,
+            about: objectTrim(info.about),
+            camera: objectTrim(info.camera),
+            lenses: objectTrim(info.lenses),
+            editing: objectTrim(info.editing),
+            others: objectTrim(info.others),
+            location: objectTrim(info.location),
             date: Date.now()
         });
         compression('upload',req.file.filename).then(resp=>{
@@ -183,12 +184,12 @@ router.post('/upload',[authorization,upload], async (req,res) =>{
 router.post('/upload/edit',authorization, async (req,res) =>{
     try {
         const edit = {
-            about: req.body.about,
-            camera: req.body.camera,
-            lenses: req.body.lenses,
-            editing: req.body.editing,
-            others: req.body.others,
-            location: req.body.location,
+            about: objectTrim(req.body.about),
+            camera: objectTrim(req.body.camera),
+            lenses: objectTrim(req.body.lenses),
+            editing: objectTrim(req.body.editing),
+            others: objectTrim(req.body.others),
+            location: objectTrim(req.body.location),
         };
         if((req.body.uid).toString() === (req.user._id).toString()){
             Upload.findByIdAndUpdate({"_id":req.body.id},{$set:edit}).then(response=>{
