@@ -163,6 +163,7 @@ router.post('/upload',[authorization,upload], async (req,res) =>{
             editing: objectTrim(info.editing),
             others: objectTrim(info.others),
             location: objectTrim(info.location),
+            settings:info.settings,
             date: Date.now()
         });
         compression('upload',req.file.filename).then(resp=>{
