@@ -191,6 +191,7 @@ router.post('/upload/edit',authorization, async (req,res) =>{
             editing: objectTrim(req.body.editing),
             others: objectTrim(req.body.others),
             location: objectTrim(req.body.location),
+            settings:req.body.settings,
         };
         if((req.body.uid).toString() === (req.user._id).toString()){
             Upload.findByIdAndUpdate({"_id":req.body.id},{$set:edit}).then(response=>{
