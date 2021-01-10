@@ -164,6 +164,7 @@ router.post('/upload',[authorization,upload], async (req,res) =>{
             others: objectTrim(info.others),
             location: objectTrim(info.location),
             settings:info.settings,
+            mode:info.mode,
             date: Date.now()
         });
         compression('upload',req.file.filename).then(resp=>{
@@ -192,6 +193,7 @@ router.post('/upload/edit',authorization, async (req,res) =>{
             others: objectTrim(req.body.others),
             location: objectTrim(req.body.location),
             settings:req.body.settings,
+            mode:req.body.mode,
         };
         if((req.body.uid).toString() === (req.user._id).toString()){
             Upload.findByIdAndUpdate({"_id":req.body.id},{$set:edit}).then(response=>{

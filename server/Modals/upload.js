@@ -39,6 +39,9 @@ const uploadSchema = mongoose.Schema({
     settings:{
         type:Object
     },
+    mode:{
+        type:String
+    },
     date:{
         type: Number,
     }
