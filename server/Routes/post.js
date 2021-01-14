@@ -163,7 +163,7 @@ router.post('/upload',[authorization,upload], async (req,res) =>{
             editing: objectTrim(info.editing),
             others: objectTrim(info.others),
             location: objectTrim(info.location),
-            settings:info.settings,
+            settings:info.mode=='Manual'?info.settings:'',
             mode:info.mode,
             date: Date.now()
         });
