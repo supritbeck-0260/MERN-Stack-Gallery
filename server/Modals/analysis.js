@@ -5,8 +5,12 @@ const analysisSchema = mongoose.Schema({
         type:String,
         require:true
     },
-    name:String,
+    owner:String,
     product:{
+        type:String,
+        require:true
+    },
+    type:{
         type:String,
         require:true
     },
