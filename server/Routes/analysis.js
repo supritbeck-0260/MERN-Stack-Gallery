@@ -1,4 +1,3 @@
-const { json } = require('body-parser');
 const express = require('express');
 const router = express.Router();
 const Analysis = require('../Modals/analysis');
@@ -17,4 +16,12 @@ router.post('/save', async (req,res)=>{
     }
 });
 
+router.post('/get',async (req,res)=>{
+  try {
+    const analysis = await Analysis.find();
+    res.json(analysis);    
+  } catch (error) {
+    req.json('Server Error');
+  }
+});
 module.exports = router;
