@@ -16,12 +16,21 @@ router.post('/save', async (req,res)=>{
     }
 });
 
-router.post('/get',async (req,res)=>{
+router.get('/show',async (req,res)=>{
   try {
     const analysis = await Analysis.find();
-    res.json(analysis);    
+    let formated = {};
+    analysis.forEach(value=>{
+      const date = new Date(value.date).toLocaleDateString()
+      if(formated[date]) formated[date].push(value);
+      else {
+        formated[date] = [];
+        formated[date].push(value);
+      }
+    });
+    res.json(formated);    
   } catch (error) {
-    req.json('Server Error');
+    res.json('Server Error');
   }
 });
 module.exports = router;
