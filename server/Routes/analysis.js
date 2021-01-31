@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const User = require('../Modals/user');
 const Analysis = require('../Modals/analysis');
+const authorization = require('../middleware/Authorization');
 router.post('/save', async (req,res)=>{
     try {
     const analysis = new Analysis({
@@ -16,8 +18,10 @@ router.post('/save', async (req,res)=>{
     }
 });
 
-router.get('/show',async (req,res)=>{
+router.get('/show',authorization,async (req,res)=>{
   try {
+    const admin = await User.findById({'_id':req.user._id});
+    if(admin.email == 'supritbeck@gmail.com'){
     const analysis = await Analysis.find();
     let formated = {};
     analysis.forEach(value=>{
@@ -28,9 +32,10 @@ router.get('/show',async (req,res)=>{
         formated[date].push(value);
       }
     });
-    res.json(formated);    
+    res.json(formated); 
+  }else  res.status(201).json({message:'Unauthorize Access'}); 
   } catch (error) {
-    res.json('Server Error');
+    res.status(201).json({message:'Server Error'});
   }
 });
 module.exports = router;
